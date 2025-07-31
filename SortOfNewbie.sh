@@ -299,61 +299,66 @@ ScriptStart
 Eval
 SectionEnd
 #
-if [[ "$Process" = "NO" ]]
+if [[ "$adminUser" = "" ]]
 	then
-		PermsCheck
-		SectionEnd
-    	Creation
+		/bin/echo 'No User Logged in, User Prompt not possible'
 	else
-		/bin/echo '"'$User'" Exists already'
-		/bin/echo # Outputting a Blank Line for Reporting Purposes
-		TokenCheck
-		#
-		if [[ "$NewUserToken" != "ENABLED" ]]
+		if [[ "$Process" = "NO" ]]
 			then
-				SectionEnd
 				PermsCheck
-				TokenAdd
-		fi
-		#
-        SectionEnd
-		UserElevated="" # Ensure Variable is initially blank
-		#
-		/bin/echo 'Checking if user "'$User'" is an admin'
-		/bin/echo # Outputting a Blank Line for Reporting Purposes
-		#
-		CurrentLocalAdmins=$(dscacheutil -q group -a name admin | grep "users" | grep -i $User)
-		#
-		if [[ "$CurrentLocalAdmins" != "" ]]
-			then
-				/bin/echo 'User "'$User'" is an admin'
-			else
-				/bin/echo 'User "'$User'" is NOT an admin'
 				SectionEnd
-				/bin/echo 'Making user "'$User'" an admin'
-				#
-				ElevateCommandA="sudo dscl . -append /Groups/admin GroupMembership $User" # Construct command to be run
-				ElevateCommandB="sudo dscl . -merge /Groups/admin GroupMembership $User" # Construct command to be run
-				#
-				##### For Degugging un-comment these 5 lines
-				#SectionEnd
-				#/bin/echo 'Debug Mode'
-				#/bin/echo # Outputting a Blank Line for Reporting Purposes
-				#/bin/echo 'Command being run is "'$ElevateCommandA'"'
-				#/bin/echo 'Command being run is "'$ElevateCommandB'"'
-				#####
-				#
-				$ElevateCommandA # Run Command
-				$ElevateCommandB # Run Command
+		    	Creation
+			else
+				/bin/echo '"'$User'" Exists already'
 				/bin/echo # Outputting a Blank Line for Reporting Purposes
-				/bin/echo 'New admins list is ....'
-				dscacheutil -q group -a name admin | grep "users" | cut -c 8-            
+				TokenCheck
+				#
+				if [[ "$NewUserToken" != "ENABLED" ]]
+					then
+						SectionEnd
+						PermsCheck
+						TokenAdd
+				fi
+				#
+		        SectionEnd
+				UserElevated="" # Ensure Variable is initially blank
+				#
+				/bin/echo 'Checking if user "'$User'" is an admin'
+				/bin/echo # Outputting a Blank Line for Reporting Purposes
+				#
+				CurrentLocalAdmins=$(dscacheutil -q group -a name admin | grep "users" | grep -i $User)
+				#
+				if [[ "$CurrentLocalAdmins" != "" ]]
+					then
+						/bin/echo 'User "'$User'" is an admin'
+					else
+						/bin/echo 'User "'$User'" is NOT an admin'
+						SectionEnd
+						/bin/echo 'Making user "'$User'" an admin'
+						#
+						ElevateCommandA="sudo dscl . -append /Groups/admin GroupMembership $User" # Construct command to be run
+						ElevateCommandB="sudo dscl . -merge /Groups/admin GroupMembership $User" # Construct command to be run
+						#
+						##### For Degugging un-comment these 5 lines
+						#SectionEnd
+						#/bin/echo 'Debug Mode'
+						#/bin/echo # Outputting a Blank Line for Reporting Purposes
+						#/bin/echo 'Command being run is "'$ElevateCommandA'"'
+						#/bin/echo 'Command being run is "'$ElevateCommandB'"'
+						#####
+						#
+						$ElevateCommandA # Run Command
+						$ElevateCommandB # Run Command
+						/bin/echo # Outputting a Blank Line for Reporting Purposes
+						/bin/echo 'New admins list is ....'
+						dscacheutil -q group -a name admin | grep "users" | cut -c 8-            
+				fi
 		fi
-fi
-#
-if [[ "$Elevated" != "" ]]
-	then
-		Demote
+		#
+		if [[ "$Elevated" != "" ]]
+			then
+				Demote
+		fi
 fi
 #
 SectionEnd
